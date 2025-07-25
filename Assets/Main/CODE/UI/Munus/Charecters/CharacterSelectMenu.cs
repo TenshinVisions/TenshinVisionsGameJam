@@ -47,9 +47,8 @@ public class CharacterSelectMenu : MonoBehaviour
 		curentSelect = (curentSelect + 1) % mags.Length;
 		trContentPoints.GetChild(trContentPoints.childCount - 1).SetAsFirstSibling();
 
-		// Sorry
-		trContentPoints.GetChild(trContentPoints.childCount - 1).GetComponent<CopyTransformPos>().Obj.position -= Vector3.up * 9999f;
-		trContentPoints.GetChild(0).GetComponent<CopyTransformPos>().Obj.position -= Vector3.up * 9999f;
+		trContentPoints.GetChild(trContentPoints.childCount - 1).GetComponent<CopyTransformPos>().Obj.position += new Vector3(1000, 1000, 0);
+		trContentPoints.GetChild(0).GetComponent<CopyTransformPos>().Obj.position -= new Vector3(1000, 1000, 0);
 
 		UpdateText();
 	}
@@ -59,9 +58,8 @@ public class CharacterSelectMenu : MonoBehaviour
 		curentSelect = (curentSelect - 1) % mags.Length;
 		trContentPoints.GetChild(0).SetSiblingIndex(trContentPoints.childCount - 1);
 
-		// Sorry
-		trContentPoints.GetChild(trContentPoints.childCount - 1).GetComponent<CopyTransformPos>().Obj.position -= Vector3.up * 9999f;
-		trContentPoints.GetChild(0).GetComponent<CopyTransformPos>().Obj.position -= Vector3.up * 9999f;
+		trContentPoints.GetChild(trContentPoints.childCount - 1).GetComponent<CopyTransformPos>().Obj.position -= new Vector3(-1000, 1000, 0);
+		trContentPoints.GetChild(0).GetComponent<CopyTransformPos>().Obj.position += new Vector3(-1000, 1000, 0);
 
 		UpdateText();
 	}

@@ -46,7 +46,11 @@ public class CharacterSelectMenu : MonoBehaviour
 	{
 		curentSelect = (curentSelect + 1) % mags.Length;
 		trContentPoints.GetChild(trContentPoints.childCount - 1).SetAsFirstSibling();
+
+		// Sorry
 		trContentPoints.GetChild(trContentPoints.childCount - 1).GetComponent<CopyTransformPos>().Obj.position -= Vector3.up * 9999f;
+		trContentPoints.GetChild(0).GetComponent<CopyTransformPos>().Obj.position -= Vector3.up * 9999f;
+
 		UpdateText();
 	}
 
@@ -54,6 +58,9 @@ public class CharacterSelectMenu : MonoBehaviour
 	{
 		curentSelect = (curentSelect - 1) % mags.Length;
 		trContentPoints.GetChild(0).SetSiblingIndex(trContentPoints.childCount - 1);
+
+		// Sorry
+		trContentPoints.GetChild(trContentPoints.childCount - 1).GetComponent<CopyTransformPos>().Obj.position -= Vector3.up * 9999f;
 		trContentPoints.GetChild(0).GetComponent<CopyTransformPos>().Obj.position -= Vector3.up * 9999f;
 
 		UpdateText();

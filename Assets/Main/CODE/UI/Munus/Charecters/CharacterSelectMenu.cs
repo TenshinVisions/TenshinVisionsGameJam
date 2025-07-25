@@ -40,6 +40,13 @@ public class CharacterSelectMenu : MonoBehaviour
 
 		Destroy(pointRef.gameObject);
 		Destroy(imagePef.gameObject);
+
+		foreach (MagicianInfo mag in mags)
+		{
+			mag.IsSelect = false;
+		}
+
+		UpdateText();
 	}
 
 	public void NewCarecter()
@@ -66,9 +73,22 @@ public class CharacterSelectMenu : MonoBehaviour
 
 	private void UpdateText()
 	{
-		int i = Math.Abs(curentSelect);
+		int i = -curentSelect;
+
+		if (i < 0)
+			i += mags.Length;
 
 		nameMag.text = mags[i].Name;
 		discriptionMag.text = mags[i].Discription;
+	}
+
+	public void SaveSelectMag()
+	{
+		int i = -curentSelect;
+
+		if (i < 0)
+			i += mags.Length;
+
+		mags[i].IsSelect = true;
 	}
 }

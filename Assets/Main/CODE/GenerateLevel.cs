@@ -1,56 +1,30 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 [System.Serializable]
-public class BossData
+public class MobPair
 {
-    public GameObject bossPrefab;  // Префаб босса
-
-    public float damage;           // Урон
-    public float speed;            // Скорость
-    public float health;           // Здоровье
-
-    public BossData(GameObject bossPrefab, float damage, float speed, float health)
-    {
-        this.bossPrefab = bossPrefab;
-        this.damage = damage;
-        this.speed = speed;
-        this.health = health;
-    }
-}
-
-[System.Serializable]
-public class TrapData
-{
-    public GameObject trapPrefab;
+    public GameObject mobPrefab;
     public int count;
-    public float damage;
 
-    public TrapData(GameObject trapPrefab, int count, float damage)
-    {
-        this.trapPrefab = trapPrefab;
-        this.count = count;
-        this.damage = damage;
-    }
-}
-
-[System.Serializable]
-public class MobData
-{
-    public GameObject mobPrefab;  // Префаб моба
-    public int count;             // Количество мобов этого типа
-
-    public float damage;          // Урон
-    public float speed;           // Скорость
-    public float health;          // Здоровье
-
-    public MobData(GameObject mobPrefab, int count, float damage, float speed, float health)
+    public MobPair(GameObject mobPrefab, int count)
     {
         this.mobPrefab = mobPrefab;
         this.count = count;
-        this.damage = damage;
-        this.speed = speed;
-        this.health = health;
+    }
+}
+
+[System.Serializable]
+public class TrapPair
+{
+    public GameObject trapPrefab;
+    public int count;
+
+    public TrapPair(GameObject trapPrefab, int count)
+    {
+        this.trapPrefab = trapPrefab;
+        this.count = count;
     }
 }
 
@@ -59,14 +33,22 @@ public class WorldData
 {
     public int width;
     public int height;
-    public List<MobData> mobs = new List<MobData>();
-    public List<TrapData> traps = new List<TrapData>();
-    public BossData boss;
 
-    public WorldData(int width, int height, List<MobData> mobs, List<TrapData> traps, BossData boss)
+    public GameObject floorPrefab;
+    public GameObject borderPrefab;
+
+    // Список пар: префаб моба и количество
+    public List<MobPair> mobs = new List<MobPair>();
+    public List<TrapPair> traps = new List<TrapPair>();
+    public GameObject boss;
+
+    public WorldData(int width, int height, GameObject floorPrefab, GameObject borderPrefab,
+                     List<MobPair> mobs, List<TrapPair> traps, GameObject boss)
     {
         this.width = width;
         this.height = height;
+        this.floorPrefab = floorPrefab;
+        this.borderPrefab = borderPrefab;
         this.mobs = mobs;
         this.traps = traps;
         this.boss = boss;
@@ -75,11 +57,7 @@ public class WorldData
 
 public class GenerateLevel : MonoBehaviour
 {
-    public GameObject floorPrefab;
-    public GameObject borderPrefab;
-
     public List<WorldData> worldsData;
-
     public int spawnRange = 50;
     public int minGap = 3;
 
@@ -88,54 +66,48 @@ public class GenerateLevel : MonoBehaviour
 
     void Start()
     {
-        SpriteRenderer sr = floorPrefab.GetComponent<SpriteRenderer>();
-        if (sr == null)
-        {
-            Debug.LogError("floorPrefab должен иметь SpriteRenderer!");
-            return;
-        }
-
-        prefabSize = sr.bounds.size;
-
-        GenerateWorlds();
+        StartCoroutine(GenerateWorlds());
     }
 
-    void GenerateWorlds()
+    IEnumerator GenerateWorlds()
     {
         int placed = 0;
         int attempts = 0;
-
         int numberOfWorlds = worldsData.Count;
 
         while (placed < numberOfWorlds && attempts < numberOfWorlds * 100)
         {
             attempts++;
 
-            int worldWidth = worldsData[placed].width;
-            int worldHeight = worldsData[placed].height;
+            var world = worldsData[placed];
+            int totalWidth = world.width + 2;
+            int totalHeight = world.height + 2;
 
-            int totalWidth = worldWidth + 2;
-            int totalHeight = worldHeight + 2;
+            SpriteRenderer sr = world.floorPrefab.GetComponent<SpriteRenderer>();
+            if (sr == null)
+            {
+                Debug.LogError("floorPrefab должен иметь SpriteRenderer!");
+                yield break;
+            }
+            prefabSize = sr.bounds.size;
 
-            Vector2Int candidateOrigin = new Vector2Int(
+            Vector2Int origin = new Vector2Int(
                 Random.Range(-spawnRange, spawnRange),
                 Random.Range(-spawnRange, spawnRange)
             );
 
-            if (IsAreaFree(candidateOrigin, totalWidth, totalHeight, minGap))
+            if (IsAreaFree(origin, totalWidth, totalHeight, minGap))
             {
-                MarkAreaOccupied(candidateOrigin, totalWidth, totalHeight);
+                MarkAreaOccupied(origin, totalWidth, totalHeight);
 
-                SpawnWorld(candidateOrigin, worldWidth, worldHeight);
-
-                SpawnMobs(candidateOrigin, worldWidth, worldHeight, worldsData[placed].mobs);
-
-                SpawnTraps(candidateOrigin, worldWidth, worldHeight, worldsData[placed].traps);
-
-                SpawnBoss(candidateOrigin, worldWidth, worldHeight, worldsData[placed].boss);
+                yield return StartCoroutine(SpawnWorld(origin, world));
+                yield return StartCoroutine(SpawnMobs(origin, world.width, world.height, world.mobs));
+                yield return StartCoroutine(SpawnTraps(origin, world.width, world.height, world.traps));
+                yield return StartCoroutine(SpawnBoss(origin, world.width, world.height, world.boss));
 
                 placed++;
             }
+            yield return null;
         }
 
         Debug.Log($"Создано миров: {placed} из {numberOfWorlds}");
@@ -147,8 +119,7 @@ public class GenerateLevel : MonoBehaviour
         {
             for (int x = -gap; x < width + gap; x++)
             {
-                Vector2Int checkPos = origin + new Vector2Int(x, y);
-                if (occupied.Contains(checkPos))
+                if (occupied.Contains(origin + new Vector2Int(x, y)))
                     return false;
             }
         }
@@ -158,110 +129,124 @@ public class GenerateLevel : MonoBehaviour
     void MarkAreaOccupied(Vector2Int origin, int width, int height)
     {
         for (int y = 0; y < height; y++)
-        {
             for (int x = 0; x < width; x++)
+                occupied.Add(origin + new Vector2Int(x, y));
+    }
+
+    IEnumerator SpawnWorld(Vector2Int origin, WorldData world)
+    {
+        for (int y = 0; y < world.height + 2; y++)
+        {
+            for (int x = 0; x < world.width + 2; x++)
             {
-                Vector2Int pos = origin + new Vector2Int(x, y);
-                occupied.Add(pos);
+                Vector2Int grid = origin + new Vector2Int(x, y);
+                Vector3 pos = new Vector3(grid.x * prefabSize.x, grid.y * prefabSize.y, 0);
+
+                bool border = (x == 0 || x == world.width + 1 || y == 0 || y == world.height + 1);
+                GameObject prefab = border ? world.borderPrefab : world.floorPrefab;
+
+                Instantiate(prefab, pos, Quaternion.identity, transform).name = (border ? "Border" : "Floor") + $" ({grid.x},{grid.y})";
             }
+            yield return null;
         }
     }
 
-    void SpawnWorld(Vector2Int origin, int width, int height)
+    IEnumerator SpawnMobs(Vector2Int origin, int width, int height, List<MobPair> mobs)
     {
-        for (int y = 0; y < height + 2; y++)
+        foreach (var mobPair in mobs)
         {
-            for (int x = 0; x < width + 2; x++)
+            GameObject prefab = mobPair.mobPrefab;
+            int count = mobPair.count;
+
+            int spawned = 0, tries = 0;
+
+            while (spawned < count && tries < count * 10)
             {
-                Vector2Int gridPos = origin + new Vector2Int(x, y);
-                Vector3 spawnPos = new Vector3(gridPos.x * prefabSize.x, gridPos.y * prefabSize.y, 0);
-
-                bool isBorder = (x == 0 || x == width + 1 || y == 0 || y == height + 1);
-                GameObject prefabToSpawn = isBorder ? borderPrefab : floorPrefab;
-
-                GameObject obj = Instantiate(prefabToSpawn, spawnPos, Quaternion.identity, transform);
-                obj.name = (isBorder ? "Border" : "Floor") + $" ({gridPos.x},{gridPos.y})";
-            }
-        }
-    }
-
-    void SpawnMobs(Vector2Int origin, int width, int height, List<MobData> mobs)
-    {
-        foreach (var mobData in mobs)
-        {
-            GameObject prefab = mobData.mobPrefab;
-            if (prefab == null)
-            {
-                Debug.LogWarning($"Префаб моба не назначен!");
-                continue;
-            }
-
-            int spawned = 0;
-            int attempts = 0;
-            int maxAttempts = mobData.count * 10;
-
-            while (spawned < mobData.count && attempts < maxAttempts)
-            {
-                attempts++;
-
+                tries++;
                 int x = Random.Range(1, width + 1);
                 int y = Random.Range(1, height + 1);
 
-                Vector2Int mobGridPos = origin + new Vector2Int(x, y);
+                Vector3 pos = new Vector3((origin.x + x) * prefabSize.x, (origin.y + y) * prefabSize.y, 0);
 
-                Vector3 spawnPos = new Vector3(mobGridPos.x * prefabSize.x, mobGridPos.y * prefabSize.y, 0);
-
-                Instantiate(prefab, spawnPos, Quaternion.identity, transform).name = $"{prefab.name}_{spawned}";
-
-                spawned++;
-            }
-        }
-    }
-
-    void SpawnTraps(Vector2Int origin, int width, int height, List<TrapData> traps)
-    {
-        foreach (var trap in traps)
-        {
-            int spawned = 0;
-            int attempts = 0;
-            while (spawned < trap.count && attempts < trap.count * 10)
-            {
-                attempts++;
-
-                int x = Random.Range(1, width + 1);
-                int y = Random.Range(1, height + 1);
-
-                Vector2Int gridPos = origin + new Vector2Int(x, y);
-                Vector3 spawnPos = new Vector3(gridPos.x * prefabSize.x, gridPos.y * prefabSize.y, 0);
-
-                Collider2D hit = Physics2D.OverlapCircle(spawnPos, prefabSize.x * 0.4f);
-                if (hit == null)
+                if (Physics2D.OverlapCircle(pos, prefabSize.x * 0.4f) == null)
                 {
-                    GameObject obj = Instantiate(trap.trapPrefab, spawnPos, Quaternion.identity, transform);
-                    obj.name = $"Trap_{trap.trapPrefab.name}_{spawned}";
+                    GameObject mobGO = Instantiate(prefab, pos, Quaternion.identity, transform);
+                    mobGO.name = $"Mob_{prefab.name}_{spawned}";
+
+                    MobBase baseFromPrefab = prefab.GetComponent<MobBase>();
+                    MobBase spawnedMob = mobGO.GetComponent<MobBase>();
+
+                    if (baseFromPrefab != null && spawnedMob != null)
+                    {
+                        spawnedMob.Initialize(
+                            baseFromPrefab.damage,
+                            baseFromPrefab.speed,
+                            baseFromPrefab.health
+                        );
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Mob prefab {prefab.name} не содержит MobBase.");
+                    }
 
                     spawned++;
+                    if (spawned % 5 == 0) yield return null;
                 }
             }
         }
     }
 
-    void SpawnBoss(Vector2Int origin, int width, int height, BossData boss)
+    IEnumerator SpawnTraps(Vector2Int origin, int width, int height, List<TrapPair> traps)
     {
-        if (boss == null || boss.bossPrefab == null)
+        foreach (var trapPair in traps)
         {
-            Debug.LogWarning("Босс или его префаб не назначен.");
-            return;
+            GameObject prefab = trapPair.trapPrefab;
+            int count = trapPair.count;
+
+            int spawned = 0;
+            int tries = 0;
+
+            while (spawned < count && tries < count * 10)
+            {
+                tries++;
+
+                int x = Random.Range(1, width + 1);
+                int y = Random.Range(1, height + 1);
+
+                Vector3 pos = new Vector3((origin.x + x) * prefabSize.x, (origin.y + y) * prefabSize.y, 0);
+
+                // Проверка, чтобы не спавнить ловушки слишком близко к другим объектам
+                if (Physics2D.OverlapCircle(pos, prefabSize.x * 0.4f) == null)
+                {
+                    GameObject trapGO = Instantiate(prefab, pos, Quaternion.identity, transform);
+                    trapGO.name = $"Trap_{prefab.name}_{spawned}";
+
+                    TrapBase baseFromPrefab = prefab.GetComponent<TrapBase>();
+                    TrapBase spawnedTrap = trapGO.GetComponent<TrapBase>();
+
+                    if (baseFromPrefab != null && spawnedTrap != null)
+                    {
+                        spawnedTrap.Initialize(baseFromPrefab.damage);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Trap prefab {prefab.name} не содержит TrapBase.");
+                    }
+
+                    spawned++;
+
+                    if (spawned % 5 == 0)
+                        yield return null;
+                }
+            }
         }
+    }
 
-        // Центр карты
-        int x = width / 2 + 1;
-        int y = height / 2 + 1;
+    IEnumerator SpawnBoss(Vector2Int origin, int width, int height, GameObject boss)
+    {
+        if (boss == null) yield return null;
 
-        Vector2Int gridPos = origin + new Vector2Int(x, y);
-        Vector3 spawnPos = new Vector3(gridPos.x * prefabSize.x, gridPos.y * prefabSize.y, 0);
-
-        GameObject obj = Instantiate(boss.bossPrefab, spawnPos, Quaternion.identity, transform);
-        obj.name = $"Boss_{boss.bossPrefab.name}";
+        Vector3 pos = new Vector3((origin.x + width / 2 + 1) * prefabSize.x, (origin.y + height / 2 + 1) * prefabSize.y, 0);
+        Instantiate(boss, pos, Quaternion.identity, transform).name = $"Boss_{boss.name}";
     }
 }

@@ -8,7 +8,7 @@ public class EntityGravity : MonoBehaviour, ISystem
 
 	void ISystem.Instal(Entity entity)
 	{
-		entity.Datas.TryGetComponent(out gravity);
+		// entity.Datas.TryGetComponent(out gravity);
 		entity.TryGetComponent(out rb);
 		priority = new StrategyByPriority(Priority.Normal, true);
 		gravity.HandlerPriority.Add(priority);

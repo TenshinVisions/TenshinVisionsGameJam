@@ -11,8 +11,8 @@ public class PlayerEntityController : MonoBehaviour
 	private void Awake()
 	{
 		TryGetComponent(out entity);
-		entity.Datas.TryGetComponent(out move);
-		entity.Datas.TryGetComponent(out jump);
+		// entity.Datas.TryGetComponent(out move);
+		// entity.Datas.TryGetComponent(out jump);
 	}
 
 	private void Update()

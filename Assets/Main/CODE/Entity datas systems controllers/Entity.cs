@@ -19,8 +19,8 @@ public class Entity : MonoBehaviour
 		}
 	}
 
-	public bool TryGetData(out Data data)
-	{
+	// public bool TryGetData(out Data data)
+	// {
 
-	}
+	// }
 }

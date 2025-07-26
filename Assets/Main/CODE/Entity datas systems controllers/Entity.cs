@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Entity : MonoBehaviour
 {
-	public GameObject Systems;
+	public GameObject Systems, Datas;
 
 	[SerializeField] private List<Data> datas;
 
@@ -18,9 +18,4 @@ public class Entity : MonoBehaviour
 			system.Instal(this);
 		}
 	}
-
-	// public bool TryGetData(out Data data)
-	// {
-
-	// }
 }

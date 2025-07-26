@@ -17,8 +17,8 @@ public class HumanoidSquat : MonoBehaviour, ISystem
 
 	void ISystem.Instal(Entity entity)
 	{
-		// entity.Datas.TryGetComponent(out squat);
-		// entity.Datas.TryGetComponent(out surface);
+		entity.Datas.TryGetComponent(out squat);
+		entity.Datas.TryGetComponent(out surface);
 
 		priority = new StrategyByPriority(Priority.Normal, true);
 		squat.HandlerPriority.Add(priority);

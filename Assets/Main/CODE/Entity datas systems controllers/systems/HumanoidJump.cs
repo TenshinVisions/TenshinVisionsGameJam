@@ -18,10 +18,10 @@ public class HumanoidJump : MonoBehaviour, ISystem
 
 	void ISystem.Instal(Entity entity)
 	{
-		// entity.Datas.TryGetComponent(out coyoteTime);
-		// entity.Datas.TryGetComponent(out surface);
-		// entity.Datas.TryGetComponent(out jump);
-		// entity.Datas.TryGetComponent(out squat);
+		entity.Datas.TryGetComponent(out coyoteTime);
+		entity.Datas.TryGetComponent(out surface);
+		entity.Datas.TryGetComponent(out jump);
+		entity.Datas.TryGetComponent(out squat);
 		entity.TryGetComponent(out rb);
 		entity.TryGetComponent(out tr);
 

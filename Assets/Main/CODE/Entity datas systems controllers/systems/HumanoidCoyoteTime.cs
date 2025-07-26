@@ -15,9 +15,9 @@ public class HumanoidCoyoteTime : MonoBehaviour, ISystem
 
 	void ISystem.Instal(Entity entity)
 	{
-		// entity.Datas.TryGetComponent(out surface);
-		// entity.Datas.TryGetComponent(out gravity);
-		// entity.Datas.TryGetComponent(out coyoteTime);
+		entity.Datas.TryGetComponent(out surface);
+		entity.Datas.TryGetComponent(out gravity);
+		entity.Datas.TryGetComponent(out coyoteTime);
 
 		entity.TryGetComponent(out rb);
 

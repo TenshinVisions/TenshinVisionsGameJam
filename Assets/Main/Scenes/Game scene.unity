@@ -327,7 +327,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1504134816
 Transform:
   m_ObjectHideFlags: 0
@@ -550,9 +550,86 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!1 &1979019580
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1979019583}
+  - component: {fileID: 1979019582}
+  m_Layer: 0
+  m_Name: GenerateLevel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1979019582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1979019580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd2d5f2fdfa5d754aa19626d6ea42a93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  worldsData:
+  - width: 50
+    height: 20
+    floorPrefab: {fileID: 7277363543191339058, guid: 84be1726b914b544b8aada84abc0b479, type: 3}
+    borderPrefab: {fileID: 1189113133718558693, guid: 15a6a1f6d3030d84f8efaf9c6d219721, type: 3}
+    mobs:
+    - mobPrefab: {fileID: 7857962982711221111, guid: 73b4e2d004de0384180f08472f6fc0db, type: 3}
+      count: 10
+    traps:
+    - trapPrefab: {fileID: 5650053964562270519, guid: 0e12d619321ba944fa9e5a070218247a, type: 3}
+      count: 16
+    boss: {fileID: 2925824566354813048, guid: c4e3f84129ae57748a8e52bb49f3f400, type: 3}
+  - width: 70
+    height: 70
+    floorPrefab: {fileID: 7277363543191339058, guid: 84be1726b914b544b8aada84abc0b479, type: 3}
+    borderPrefab: {fileID: 1189113133718558693, guid: 15a6a1f6d3030d84f8efaf9c6d219721, type: 3}
+    mobs: []
+    traps:
+    - trapPrefab: {fileID: 5650053964562270519, guid: 0e12d619321ba944fa9e5a070218247a, type: 3}
+      count: 16
+    boss: {fileID: 2925824566354813048, guid: c4e3f84129ae57748a8e52bb49f3f400, type: 3}
+  - width: 40
+    height: 80
+    floorPrefab: {fileID: 7277363543191339058, guid: 84be1726b914b544b8aada84abc0b479, type: 3}
+    borderPrefab: {fileID: 1189113133718558693, guid: 15a6a1f6d3030d84f8efaf9c6d219721, type: 3}
+    mobs: []
+    traps:
+    - trapPrefab: {fileID: 5650053964562270519, guid: 0e12d619321ba944fa9e5a070218247a, type: 3}
+      count: 14
+    boss: {fileID: 2925824566354813048, guid: c4e3f84129ae57748a8e52bb49f3f400, type: 3}
+  spawnRange: 50
+  minGap: 3
+--- !u!4 &1979019583
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1979019580}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.1841364, y: 0.17641161, z: -0.013885589}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1800686561}
   - {fileID: 1504134816}
+  - {fileID: 1979019583}

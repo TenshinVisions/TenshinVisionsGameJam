@@ -17,7 +17,7 @@ public class HumanoidSurface : MonoBehaviour, ISystem
 
 	void ISystem.Instal(Entity entity)
 	{
-		entity.Datas.TryGetComponent(out surface);
+		// entity.Datas.TryGetComponent(out surface);
 		entity.TryGetComponent(out tr);
 		entity.TryGetComponent(out rb);
 

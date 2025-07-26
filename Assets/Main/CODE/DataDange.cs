@@ -58,7 +58,7 @@ public class DataDange
 		public UseMobe Mobs;
 		public Density[] MobsDensity;
 
-		public UseMobe UseTraps;
+		public UseTraps UseTraps;
 		public Density[] UseTrapsDensity;
 	}
 }

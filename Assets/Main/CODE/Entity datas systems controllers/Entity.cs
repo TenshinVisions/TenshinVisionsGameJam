@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class Entity : MonoBehaviour
 {
-	public GameObject Datas, Systems;
+	public GameObject Systems;
+
+	[SerializeField] private List<Data> datas;
 
 	private void Awake()
 	{
@@ -15,5 +17,10 @@ public class Entity : MonoBehaviour
 			Debug.Log($"{name}: system: {system}");
 			system.Instal(this);
 		}
+	}
+
+	public bool TryGetData(out Data data)
+	{
+
 	}
 }

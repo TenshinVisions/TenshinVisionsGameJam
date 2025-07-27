@@ -15,8 +15,29 @@ public class MapWithDungeons : MonoBehaviour
 	[SerializeField] private Transform cursorTr;
 	[SerializeField] private Color canPut, noPut;
 
+
 	[Space]
 	[SerializeField] private GameObject buttonsAssert;
+
+	[Space]
+	[SerializeField] private int openMunu;
+	[SerializeField] private MenuController menuController;
+
+	private void OnEnable()
+	{
+		DungeonOmMap.OpenDangeHandler += OpenDange;
+	}
+
+	private void OnDisable()
+	{
+		DungeonOmMap.OpenDangeHandler -= OpenDange;
+	}
+
+	private void OpenDange()
+	{
+		menuController.OpenMenu(openMunu);
+	}
+
 
 	public static StateDungeonSettings State = StateDungeonSettings.TryOn;
 

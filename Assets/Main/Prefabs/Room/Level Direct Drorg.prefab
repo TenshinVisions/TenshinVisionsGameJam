@@ -5534,7 +5534,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1022cf85a0215f64ba8d27fa8f2c2306, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mobs: []
+  mobs:
+  - mobPrefab: {fileID: 0}
+    count: 0
   traps: []
   boss: {fileID: 0}
 --- !u!1 &6000348679454991085

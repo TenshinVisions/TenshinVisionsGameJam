@@ -24,6 +24,11 @@ public class HiroOnMap : MonoBehaviour
 		State = CharecterState.InWay;
 	}
 
+	private void OnEnable()
+	{
+		Stop();
+	}
+
 	private void Update()
 	{
 		if (State == CharecterState.InWay && coroutineMove == null)

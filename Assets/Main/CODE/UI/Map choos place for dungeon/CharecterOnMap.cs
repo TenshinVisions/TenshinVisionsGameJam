@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class CharecterOnMap : MonoBehaviour
 {
 	[SerializeField] private Image image;
-
-	public CharecterState State;
+	[SerializeField] private 
+	CharecterState State;
 }
 
 public enum CharecterState

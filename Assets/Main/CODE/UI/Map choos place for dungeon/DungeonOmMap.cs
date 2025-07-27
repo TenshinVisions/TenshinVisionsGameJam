@@ -11,7 +11,7 @@ public class DungeonOmMap : MonoBehaviour
 	private Vector3 savePosOnMap;
 	private Transform saveParentHere, SeveHero;
 
-	[SerializeField] private Transform dungeonObj, buttonsObj;
+	[SerializeField] private Transform buttonsObj;
 	[SerializeField] private GameObject HiroInDungeon;
 
 	public static Action OpenDangeHandler;
@@ -29,9 +29,6 @@ public class DungeonOmMap : MonoBehaviour
 	public void OpenDange()
 	{
 		buttonsObj.gameObject.SetActive(false);
-		dungeonObj.gameObject.SetActive(true);
-		dungeonObj.SetParent(null);
-		dungeonObj.localScale = Vector3.one;
 
 		OpenDangeHandler?.Invoke();
 	}
@@ -42,6 +39,5 @@ public class DungeonOmMap : MonoBehaviour
 		SeveHero.SetParent(saveParentHere);
 		SeveHero.transform.position = savePosOnMap;
 		saveParentHere.gameObject.SetActive(true);
-		dungeonObj.SetParent(transform);
 	}
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,6 +7,8 @@ public class MapWithDungeons : MonoBehaviour
 {
 	public static bool PlaceIsFree = false, CusorOnMap = true;
 	public static List<DungeonOmMap> Dangeons = new();
+
+	[SerializeField] private GameObject cameraUI;
 
 	[SerializeField] private DungeonOmMap dangeRef;
 	[SerializeField] private Transform contentDungeon;
@@ -35,6 +38,7 @@ public class MapWithDungeons : MonoBehaviour
 
 	private void OpenDange()
 	{
+		cameraUI.SetActive(false);	
 		menuController.OpenMenu(openMunu);
 	}
 

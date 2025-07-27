@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting.Antlr3.Runtime.Tree;
@@ -10,7 +11,10 @@ public class DungeonOmMap : MonoBehaviour
 	private Vector3 savePosOnMap;
 	private Transform saveParentHere, SeveHero;
 
-	[SerializeField] private Transform dungeonObj, buttonsObj;
+	[SerializeField] private Transform buttonsObj;
+	[SerializeField] private GameObject HiroInDungeon;
+
+	public static Action OpenDangeHandler;
 
 	public void EnterTheHero(GameObject hero)
 	{
@@ -25,9 +29,8 @@ public class DungeonOmMap : MonoBehaviour
 	public void OpenDange()
 	{
 		buttonsObj.gameObject.SetActive(false);
-		SeveHero.SetParent(dungeonObj);
-		dungeonObj.gameObject.SetActive(true);
-		SeveHero.transform.localPosition = Vector3.zero;
+
+		OpenDangeHandler?.Invoke();
 	}
 
 	public void LiaveDungeonHire()

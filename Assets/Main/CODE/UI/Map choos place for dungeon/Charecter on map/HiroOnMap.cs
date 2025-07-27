@@ -2,11 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEngine.GraphicsBuffer;
 
-public class CharecterOnMapMenu : MonoBehaviour
+public class HiroOnMap : MonoBehaviour
 {
-	[SerializeField] private Image image;
 	[SerializeField] private CharecterState State;
 	[SerializeField] private Vector2 mapSize;
 	[SerializeField] private float speed;
@@ -21,78 +19,53 @@ public class CharecterOnMapMenu : MonoBehaviour
 
 	[SerializeField] private float MaxDistanceOnDange;
 
-	private void OnEnable()
+	private void Awake()
 	{
-		NewRandomAction();
+		State = CharecterState.InWay;
 	}
 
-	private void FixedUpdate()
+	private void Update()
 	{
 		if (State == CharecterState.InWay && coroutineMove == null)
 		{
-			NewRandomAction();
-		}
-		else if (State != CharecterState.InWay && coroutineMove != null)
-		{
-			Stop();
+			Vector3 newRandomPoint  =new Vector3
+				(
+				Random.Range(-mapSize.x, mapSize.x),
+				Random.Range(-mapSize.y, mapSize.y),
+				0
+				);
+
+			coroutineMove = StartCoroutine(Movement(newRandomPoint));
 		}
 	}
 
 	private IEnumerator Movement(Vector3 target)
 	{
 		yield return new WaitForSeconds(Random.Range(0, maxSleepTime));
-		target.z = 0;
 
 		Vector3 direction = (target - transform.position).normalized;
+
+		float distance;
 
 		do
 		{
 			ChackDunge();
 
 			if (State != CharecterState.InWay)
+			{
 				yield break;
-			
-			Debug.Log(direction * speed);
+			}
 
-			transform.position += direction * speed;
-			yield return new WaitForFixedUpdate();
-		} 
-		while ((transform.position - target).magnitude > speed);
+			transform.position += direction * speed * Time.deltaTime;
+			yield return new WaitForEndOfFrame();
+
+			distance = (transform.position - target).magnitude;
+		}
+		while (distance > speed * Time.deltaTime || distance > 0.5f);
 
 		transform.position = target;
 
 		Stop();
-	}
-
-	private void NewRandomAction()
-	{
-		Stop();
-
-		int i = Random.Range(0, 2);
-			
-		if (i <= 1)
-		{
-			Vector3 newRandomPoint = new Vector3
-				(
-					Random.Range(-mapSize.x, mapSize.x),
-					Random.Range(-mapSize.y, mapSize.y),
-					0
-				);
-
-			coroutineMove = StartCoroutine(Movement(newRandomPoint));
-		}
-		else
-		{
-			coroutineMove = StartCoroutine(Movement(Canceles[Random.Range(0, Canceles.Length -1)].position)); ;
-		}
-	}
-
-	private void Stop()
-	{
-		if (coroutineMove == null)
-			return;
-		StopCoroutine(coroutineMove);
-		coroutineMove = null;
 	}
 
 	private void ChackDunge()
@@ -116,7 +89,18 @@ public class CharecterOnMapMenu : MonoBehaviour
 		State = CharecterState.InDungeon;
 		curentDange.EnterTheHero(gameObject);
 	}
+
+	private void Stop()
+	{
+		if (coroutineMove == null)
+			return;
+
+		StopAllCoroutines();
+		coroutineMove = null;
+	}
 }
+
+
 
 public enum CharecterState
 {

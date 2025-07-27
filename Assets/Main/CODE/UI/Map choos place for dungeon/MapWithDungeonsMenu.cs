@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,16 +8,40 @@ public class MapWithDungeons : MonoBehaviour
 	public static bool PlaceIsFree = false, CusorOnMap = true;
 	public static List<DungeonOmMap> Dangeons = new();
 
+	[SerializeField] private GameObject cameraUI;
+
 	[SerializeField] private DungeonOmMap dangeRef;
-	[SerializeField] private Transform content;
+	[SerializeField] private Transform contentDungeon;
 
 	[Space]
 	[SerializeField] private Image cursorImage;
 	[SerializeField] private Transform cursorTr;
 	[SerializeField] private Color canPut, noPut;
 
+
 	[Space]
 	[SerializeField] private GameObject buttonsAssert;
+
+	[Space]
+	[SerializeField] private int openMunu;
+	[SerializeField] private MenuController menuController;
+
+	private void OnEnable()
+	{
+		DungeonOmMap.OpenDangeHandler += OpenDange;
+	}
+
+	private void OnDisable()
+	{
+		DungeonOmMap.OpenDangeHandler -= OpenDange;
+	}
+
+	private void OpenDange()
+	{
+		cameraUI.SetActive(false);	
+		menuController.OpenMenu(openMunu);
+	}
+
 
 	public static StateDungeonSettings State = StateDungeonSettings.TryOn;
 
@@ -75,7 +100,7 @@ public class MapWithDungeons : MonoBehaviour
 
 		if (addDange)
 		{
-			DungeonOmMap buffer = Instantiate(dangeRef, saveInstalPos, Quaternion.identity, content);
+			DungeonOmMap buffer = Instantiate(dangeRef, saveInstalPos, Quaternion.identity, contentDungeon);
 			Dangeons.Add(buffer);
 		}
 	}

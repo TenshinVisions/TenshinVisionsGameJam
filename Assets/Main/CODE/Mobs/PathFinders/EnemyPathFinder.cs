@@ -41,7 +41,7 @@ public class EnemyPathFinder : MonoBehaviour
         CheckedNodes.Add(startNode);
         WaitingNodes.AddRange(GetNeighbourNodes(startNode));
 
-        while (WaitingNodes.Count > 0 && CheckedNodes.Count < 150)
+        while (WaitingNodes.Count > 0 && CheckedNodes.Count < 20)
         {
             EnemyNode nodeToCheck = WaitingNodes.Where(x => x.F == WaitingNodes.Min(y => y.F)).FirstOrDefault();
 

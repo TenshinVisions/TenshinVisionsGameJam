@@ -32,22 +32,14 @@ public class Enemy : MonoBehaviour
 
     private void Start()
     {
+        pathFinder = GetComponent<EnemyPathFinder>();
         polygonCollider2D = GetComponent<PolygonCollider2D>();
         currentHealth = entitySO.entityHealth;
         damage = entitySO.entityDamage;
         if (hero != null)
         {
-            pathFinder = GetComponent<EnemyPathFinder>();
             PathToHero = pathFinder.GetPath(hero.transform.position);
-        }
-        else
-        {
-            if (FindAnyObjectByType<Hero>() != null)
-            {
-                hero = FindAnyObjectByType<Hero>();
-                pathFinder = GetComponent<EnemyPathFinder>();
-                PathToHero = pathFinder.GetPath(hero.transform.position);
-            }
+            isMoving = true;
         }
         isAlive = true;
     }
@@ -56,7 +48,15 @@ public class Enemy : MonoBehaviour
     {
         if (hero == null)
         {
-            return;
+            if (FindFirstObjectByType<Hero>() != null)
+            {
+                hero = FindFirstObjectByType<Hero>();
+                pathFinder.Target = hero;
+            }
+            else
+            {
+                return;
+            }
         }
         if (Vector2.Distance(transform.position, hero.transform.position) <= distanceToAttack)
         {
@@ -116,6 +116,7 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(Transform source, int amount)
     {
+        polygonCollider2D.enabled = false;
         OnEnemyTakeHit?.Invoke(this, EventArgs.Empty);
         currentHealth -= amount;
         DetectDeath();
@@ -140,12 +141,15 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
+        if (collision.transform.tag != "Hero")
+            return;
         if (collision.transform.TryGetComponent(out Hero targeted_hero))
-        {
-            targeted_hero.TakeDamage(transform, damage);
-        }
+            {
+                Debug.Log("Skele Attack");
+                targeted_hero.TakeDamage(transform, damage);
+            }
     }
 
     public void ChangeFacingDirection(Vector2 sourcePosition, Vector2 targetPosition)

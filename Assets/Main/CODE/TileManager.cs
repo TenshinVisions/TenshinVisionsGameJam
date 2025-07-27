@@ -1,9 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class TileManager : BaseTile
 {
+    [Header("Tilemap Reference")]
+    public Tilemap tilemap; // Привяжи сюда свой Tilemap в инспекторе
+
     private void Start()
     {
         SpawnEntitiesOnTile();
@@ -11,36 +14,38 @@ public class TileManager : BaseTile
 
     public override void SpawnEntitiesOnTile()
     {
-        float tileSize = GetTileSize();
+        if (tilemap == null)
+        {
+            Debug.LogError("TileManager: Tilemap не привязан!");
+            return;
+        }
 
-        // Спавн мобов без ограничений по расстоянию
+        // Спавн мобов
         foreach (var mobPair in mobs)
         {
             for (int i = 0; i < mobPair.count; i++)
             {
-                Vector3 spawnPos = GetFreeRandomPositionInTile(transform.position, tileSize, 1f);
+                Vector3 spawnPos = GetRandomWorldPositionFromTilemap();
                 Instantiate(mobPair.mobPrefab, spawnPos, Quaternion.identity, transform);
             }
         }
 
-        // Для ловушек создаём список занятых позиций
+        // Спавн ловушек с проверкой расстояния
         List<Vector3> trapPositions = new List<Vector3>();
-        float minDistance = 2f; // минимальное расстояние между ловушками (2 блока)
+        float minDistance = 2f;
 
         foreach (var trapPair in traps)
         {
             for (int i = 0; i < trapPair.count; i++)
             {
                 Vector3 spawnPos;
-
-                // Пытаемся найти позицию, которая не ближе minDistance к другим ловушкам
                 int tries = 0;
                 const int maxTries = 50;
+
                 do
                 {
-                    spawnPos = GetFreeRandomPositionInTile(transform.position, tileSize, 1f);
+                    spawnPos = GetRandomWorldPositionFromTilemap();
                     tries++;
-                    // Если за maxTries не нашли подходящую позицию — всё равно спавним
                     if (tries > maxTries) break;
                 }
                 while (IsTooClose(spawnPos, trapPositions, minDistance));
@@ -53,12 +58,11 @@ public class TileManager : BaseTile
         // Спавн босса, если есть
         if (boss != null)
         {
-            Vector3 spawnPos = transform.position + Vector3.up * 1f; // поднимаем чуть вверх
-            Instantiate(boss, spawnPos, Quaternion.identity, transform);
+            Vector3 bossPos = GetRandomWorldPositionFromTilemap() + Vector3.up * 0.5f; // чуть выше тайла
+            Instantiate(boss, bossPos, Quaternion.identity, transform);
         }
     }
 
-    // Проверяем, есть ли в списке позиций объекты ближе чем minDistance
     private bool IsTooClose(Vector3 pos, List<Vector3> positions, float minDistance)
     {
         foreach (var otherPos in positions)
@@ -69,39 +73,27 @@ public class TileManager : BaseTile
         return false;
     }
 
-
-    // Пример получения случайной позиции в пределах тайла (предполагается квадрат 5x5)
-    private Vector3 GetFreeRandomPositionInTile(Vector3 tilePosition, float tileSize, float checkRadius = 0.5f, int maxTries = 20)
+    // Возвращает случайную мировую позицию, соответствующую заполненному тайлу Tilemap
+    private Vector3 GetRandomWorldPositionFromTilemap()
     {
-        float halfSize = tileSize / 2f;
+        BoundsInt bounds = tilemap.cellBounds;
+        List<Vector3> validPositions = new List<Vector3>();
 
-        for (int i = 0; i < maxTries; i++)
+        foreach (var cellPos in bounds.allPositionsWithin)
         {
-            float x = Random.Range(tilePosition.x - halfSize, tilePosition.x + halfSize);
-            float y = Random.Range(tilePosition.y - halfSize, tilePosition.y + halfSize);
-            Vector3 pos = new Vector3(x, y, tilePosition.z);
-
-            // Проверка на наличие коллайдера
-            if (!Physics.CheckBox(pos, Vector3.one * checkRadius / 2f))
+            if (tilemap.HasTile(cellPos))
             {
-                return pos;
+                Vector3 worldPos = tilemap.CellToWorld(cellPos) + tilemap.tileAnchor;
+                validPositions.Add(worldPos);
             }
         }
 
-        // Если не нашли свободную позицию — возвращаем центр
-        return tilePosition;
-    }
-
-    private float GetTileSize()
-    {
-        var box = GetComponent<BoxCollider>();
-        if (box != null)
+        if (validPositions.Count == 0)
         {
-            // Получаем локальный размер бокса и берём минимальное значение между X и Y (по полу)
-            return Mathf.Min(box.size.x * transform.localScale.x, box.size.y * transform.localScale.y);
+            Debug.LogWarning("TileManager: нет валидных тайлов для спавна!");
+            return transform.position;
         }
 
-        // Если коллайдера нет — дефолт
-        return 5f;
+        return validPositions[Random.Range(0, validPositions.Count)];
     }
 }

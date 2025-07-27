@@ -9,14 +9,35 @@ public class PathFinder : MonoBehaviour
     public List<Vector2> PathToTarget;
     List<Node> CheckedNodes = new List<Node>();
     List<Node> WaitingNodes = new List<Node>();
-    public Enemy Target;
+
+    public Target Target;
+    public TargetObject targetObject;
+    public Enemy targetEnemy;
+    public bool cleared = false;
     public LayerMask SolidLayer;
 
 
     void Update()
     {
         if (Target != null)
+        {
             PathToTarget = GetPath(Target.transform.position);
+        }
+        else if (Target == null)
+        {
+            if (FindAnyObjectByType<Enemy>() != null)
+            {
+                Target = FindAnyObjectByType<Enemy>();
+            }
+            else if (FindAnyObjectByType<TargetObject>() != null)
+            {
+                Target = FindAnyObjectByType<TargetObject>();
+            }
+            else
+            {
+                return;
+            }
+        }
     }
 
     public List<Vector2> GetPath(Vector2 target)
@@ -24,6 +45,14 @@ public class PathFinder : MonoBehaviour
         PathToTarget = new List<Vector2>();
         CheckedNodes = new List<Node>();
         WaitingNodes = new List<Node>();
+        if (!cleared)
+        {
+            var Target = targetEnemy;
+        }
+        else
+        {
+            var Target = targetObject;
+        }
 
         Vector2 StartPosition = new Vector2(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y));
         Vector2 TargetPosition = new Vector2(Mathf.Round(Target.transform.position.x), Mathf.Round(Target.transform.position.y));
@@ -34,7 +63,7 @@ public class PathFinder : MonoBehaviour
         CheckedNodes.Add(startNode);
         WaitingNodes.AddRange(GetNeighbourNodes(startNode));
 
-        while (WaitingNodes.Count > 0 && CheckedNodes.Count < 30)
+        while (WaitingNodes.Count > 0 && CheckedNodes.Count < 1000)
         {
             Node nodeToCheck = WaitingNodes.Where(x => x.F == WaitingNodes.Min(y => y.F)).FirstOrDefault();
 
@@ -97,8 +126,8 @@ public class PathFinder : MonoBehaviour
         {
             foreach (var item in CheckedNodes)
             {
-                Gizmos.color = Color.green;
-                Gizmos.DrawSphere(new Vector2(item.Position.x, item.Position.y), 0.05f);
+                //Gizmos.color = Color.green;
+                //Gizmos.DrawSphere(new Vector2(item.Position.x, item.Position.y), 0.05f);
             }
             if (PathToTarget != null)
             {

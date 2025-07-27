@@ -5,7 +5,7 @@ using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Enemy : Target
 {
     [SerializeField] EntitySO entitySO;
     List<Vector2> PathToHero = new List<Vector2>();

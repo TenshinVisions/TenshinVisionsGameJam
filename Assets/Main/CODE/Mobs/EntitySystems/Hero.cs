@@ -16,11 +16,16 @@ public class Hero : MonoBehaviour
     int damage;
 
     public Enemy enemy;
+    public Target target;
+
+
+    int level = 1;
     public float moveSpeed = 1.4f;
     float nextAttackTime;
     [SerializeField] float distanceToAttack = 1.2f;
     [SerializeField] public float attackRate = 1.5f;
     public bool isTakeHit = false;
+    bool isAnyEnemy = false;
 
     PolygonCollider2D polygonCollider2D;
 
@@ -35,76 +40,96 @@ public class Hero : MonoBehaviour
         polygonCollider2D = GetComponent<PolygonCollider2D>();
         currentHealth = entitySO.entityHealth;
         damage = entitySO.entityDamage;
-        if (enemy != null)
+        if (target != null)
         {
             PathToEnemy = pathFinder.GetPath(enemy.transform.position);
             isMoving = true;
         }
     }
+    
 
     private void Update()
     {
-        if (enemy == null)
+        if (target == null)
         {
-            if (FindFirstObjectByType<Enemy>() != null)
+            if (isAnyEnemy)
             {
-                enemy = FindFirstObjectByType<Enemy>();
-                pathFinder.Target = enemy;
-            }
-            else
-            {
-                return;
-            }
-        }
-
-        if (Vector2.Distance(transform.position, enemy.transform.position) <= distanceToAttack)
-        {
-            isMoving = false;
-            if (Time.time > nextAttackTime)
-            {
-                OnHeroAttack?.Invoke(this, EventArgs.Empty);
-                nextAttackTime = Time.time + attackRate;
-                
-            }
-
-        }
-        else if (Vector2.Distance(transform.position, enemy.transform.position) > distanceToAttack)
-        {
-            polygonCollider2D.enabled = false;
-            if (Vector2.Distance(transform.position, enemy.transform.position) > distanceToAttack && PathToEnemy.Count == 0)
-            {
-                PathToEnemy = pathFinder.GetPath(enemy.transform.position);
-                isMoving = true;
-            }
-            if (PathToEnemy.Count == 0)
-            {
-                return;
-            }
-
-            if (isMoving)
-            {
-                if (Vector2.Distance(transform.position, PathToEnemy[PathToEnemy.Count - 1]) > 0.3f)
+                if (FindFirstObjectByType<Enemy>() != null)
                 {
-                    isMoving = true;
-                    transform.position = Vector2.MoveTowards(transform.position, PathToEnemy[PathToEnemy.Count - 1], moveSpeed * Time.deltaTime);
-                    ChangeFacingDirection(new Vector2(transform.position.x, transform.position.y), PathToEnemy[PathToEnemy.Count - 1]);
+                    target = FindFirstObjectByType<Enemy>();
+                    pathFinder.Target = target;
                 }
-
-                if (Vector2.Distance(transform.position, PathToEnemy[PathToEnemy.Count - 1]) <= 0.3f)
+                else
                 {
-                    isMoving = false;
+                    return;
                 }
-
             }
-            else
+            else if (!isAnyEnemy)
             {
-                PathToEnemy = pathFinder.GetPath(enemy.transform.position);
-                isMoving = true;
+                if (FindFirstObjectByType<TargetObject>() != null)
+                {
+                    target = FindFirstObjectByType<TargetObject>();
+                    pathFinder.Target = target;
+                }
+                else
+                {
+                    return;
+                }
             }
         }
         else
         {
-            isMoving = false;
+            if (Vector2.Distance(transform.position, target.transform.position) <= distanceToAttack)
+            {
+                isMoving = false;
+                if (Time.time > nextAttackTime)
+                {
+                    OnHeroAttack?.Invoke(this, EventArgs.Empty);
+                    nextAttackTime = Time.time + attackRate;
+
+                }
+
+
+            }
+            else if (Vector2.Distance(transform.position, target.transform.position) > distanceToAttack)
+            {
+                polygonCollider2D.enabled = false;
+                if (Vector2.Distance(transform.position, target.transform.position) > distanceToAttack && PathToEnemy.Count == 0)
+                {
+                    PathToEnemy = pathFinder.GetPath(target.transform.position);
+                    isMoving = true;
+                }
+                if (PathToEnemy.Count == 0)
+                {
+                    return;
+                }
+
+                if (isMoving)
+                {
+                    if (Vector2.Distance(transform.position, PathToEnemy[PathToEnemy.Count - 1]) > 0.3f)
+                    {
+                        isMoving = true;
+                        transform.position = Vector2.MoveTowards(transform.position, PathToEnemy[PathToEnemy.Count - 1], moveSpeed * Time.deltaTime);
+                        ChangeFacingDirection(new Vector2(transform.position.x, transform.position.y), PathToEnemy[PathToEnemy.Count - 1]);
+                    }
+
+                    if (Vector2.Distance(transform.position, PathToEnemy[PathToEnemy.Count - 1]) <= 0.3f)
+                    {
+                        isMoving = false;
+                    }
+
+                }
+                else
+                {
+                    PathToEnemy = pathFinder.GetPath(target.transform.position);
+                    isMoving = true;
+                }
+            }
+            else
+            {
+                isMoving = false;
+            }
+            return;
         }
     }
 
@@ -122,11 +147,11 @@ public class Hero : MonoBehaviour
 
     public void PolygonColliderTurnOn()
     {
-        if (!isMoving)
+        if (!isMoving && isAnyEnemy)
             polygonCollider2D.enabled = true;
-        else
+        else if (!isAnyEnemy)
         {
-            ChangeFacingDirection(new Vector2(transform.position.x, transform.position.y), PathToEnemy[PathToEnemy.Count - 1]);
+            polygonCollider2D.enabled = true;
         }
     }
 
@@ -140,13 +165,43 @@ public class Hero : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.tag != "Enemy")
-            return;
-        if (collision.transform.TryGetComponent(out Enemy targeted_enemy))
+        if (collision.tag == "Enemy")
+        {
+            if (collision.transform.TryGetComponent(out Enemy targeted_enemy))
             {
                 Debug.Log("Attack");
                 targeted_enemy.TakeDamage(transform, damage);
             }
+        }
+        
+    }
+    
+    private void OnCollisionEnter2D(Collision2D other) {
+        Debug.Log("Getting Ready");
+        if (other.transform.tag == "Exit")
+        {
+            Debug.Log("Almost");
+            if (target != null && !isAnyEnemy)
+            {
+                level += 1;
+                Debug.Log("Next Level");
+                if (GameObject.Find($"InPoint{level}") != null)
+                {
+                    Debug.Log("Teleport");
+                    transform.position = GameObject.Find($"InPoint{level}").transform.position;
+                    if (FindFirstObjectByType<TargetObject>() != null)
+                    {
+                        target = FindFirstObjectByType<TargetObject>();
+                    }
+                    else
+                    {
+                        target = null;
+                        return;
+                    }
+                
+                }
+            }
+        }
     }
 
     public void ChangeFacingDirection(Vector2 sourcePosition, Vector2 targetPosition)
@@ -159,7 +214,7 @@ public class Hero : MonoBehaviour
         {
             transform.rotation = Quaternion.Euler(0, 0, 0);
         }
-        
+
     }
 
 }

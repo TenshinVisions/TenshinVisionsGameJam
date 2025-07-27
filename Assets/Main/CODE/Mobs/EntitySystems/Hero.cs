@@ -177,30 +177,32 @@ public class Hero : MonoBehaviour
     }
     
     private void OnCollisionEnter2D(Collision2D other) {
-        Debug.Log("Getting Ready");
         if (other.transform.tag == "Exit")
         {
-            Debug.Log("Almost");
             if (target != null && !isAnyEnemy)
             {
-                level += 1;
-                Debug.Log("Next Level");
-                if (GameObject.Find($"InPoint{level}") != null)
-                {
-                    Debug.Log("Teleport");
-                    transform.position = GameObject.Find($"InPoint{level}").transform.position;
-                    if (FindFirstObjectByType<TargetObject>() != null)
-                    {
-                        target = FindFirstObjectByType<TargetObject>();
-                    }
-                    else
-                    {
-                        target = null;
-                        return;
-                    }
-                
-                }
+                NextLevel();
             }
+        }
+    }
+
+    public void NextLevel()
+    {
+        level += 1;
+        if (GameObject.Find($"InPoint{level}") != null)
+        {
+            Debug.Log("Teleport");
+            transform.position = GameObject.Find($"InPoint{level}").transform.position;
+            if (FindFirstObjectByType<TargetObject>() != null)
+            {
+                target = FindFirstObjectByType<TargetObject>();
+            }
+            else
+            {
+                target = null;
+                return;
+            }
+                
         }
     }
 

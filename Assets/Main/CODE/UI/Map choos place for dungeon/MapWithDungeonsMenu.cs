@@ -8,7 +8,7 @@ public class MapWithDungeons : MonoBehaviour
 	public static List<DungeonOmMap> Dangeons = new();
 
 	[SerializeField] private DungeonOmMap dangeRef;
-	[SerializeField] private Transform content;
+	[SerializeField] private Transform contentDungeon;
 
 	[Space]
 	[SerializeField] private Image cursorImage;
@@ -96,7 +96,7 @@ public class MapWithDungeons : MonoBehaviour
 
 		if (addDange)
 		{
-			DungeonOmMap buffer = Instantiate(dangeRef, saveInstalPos, Quaternion.identity, content);
+			DungeonOmMap buffer = Instantiate(dangeRef, saveInstalPos, Quaternion.identity, contentDungeon);
 			Dangeons.Add(buffer);
 		}
 	}

@@ -5,9 +5,9 @@ using UnityEngine.UI;
 public class MapWithDungeons : MonoBehaviour
 {
 	public static bool PlaceIsFree = false, CusorOnMap = true;
-	public static List<DangeonOmMap> Dangeons = new();
+	public static List<DungeonOmMap> Dangeons = new();
 
-	[SerializeField] private DangeonOmMap dangeRef;
+	[SerializeField] private DungeonOmMap dangeRef;
 	[SerializeField] private Transform content;
 
 	[Space]
@@ -74,7 +74,10 @@ public class MapWithDungeons : MonoBehaviour
 		State = StateDungeonSettings.TryOn;
 
 		if (addDange)
-			Instantiate(dangeRef, saveInstalPos, Quaternion.identity, content);
+		{
+			DungeonOmMap buffer = Instantiate(dangeRef, saveInstalPos, Quaternion.identity, content);
+			Dangeons.Add(buffer);
+		}
 	}
 
 	public enum StateDungeonSettings

@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74808b00b78372040a11cc83b1d524db, type: 3}
+  m_Script: {fileID: 11500000, guid: a7938661efb134840b6b04de93e30354, type: 3}
   m_Name: KnightSO
   m_EditorClassIdentifier: 
-  entityName: Knight
-  entityHealth: 20
+  entityName: Skeleton
+  entityHealth: 30
   entityDamage: 5

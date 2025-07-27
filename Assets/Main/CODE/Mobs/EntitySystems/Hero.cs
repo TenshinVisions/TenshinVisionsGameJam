@@ -20,20 +20,23 @@ public class Hero : MonoBehaviour
     float nextAttackTime;
     [SerializeField] float distanceToAttack = 1.2f;
     [SerializeField] public float attackRate = 1.5f;
+    public bool isTakeHit = false;
 
     PolygonCollider2D polygonCollider2D;
 
     public event EventHandler OnHeroAttack;
     public event EventHandler OnHeroTakeHit;
 
+
     private void Start()
     {
+        transform.position = GameObject.Find("InPoint1").transform.position;
+        pathFinder = GetComponent<PathFinder>();
         polygonCollider2D = GetComponent<PolygonCollider2D>();
         currentHealth = entitySO.entityHealth;
         damage = entitySO.entityDamage;
         if (enemy != null)
         {
-            pathFinder = GetComponent<PathFinder>();
             PathToEnemy = pathFinder.GetPath(enemy.transform.position);
             isMoving = true;
         }
@@ -61,6 +64,7 @@ public class Hero : MonoBehaviour
             {
                 OnHeroAttack?.Invoke(this, EventArgs.Empty);
                 nextAttackTime = Time.time + attackRate;
+                
             }
 
         }
@@ -106,6 +110,7 @@ public class Hero : MonoBehaviour
 
     public void TakeDamage(Transform source, int amount)
     {
+        isTakeHit = true;
         OnHeroTakeHit?.Invoke(this, EventArgs.Empty);
         currentHealth -= amount;
         DetectDeath();
@@ -135,10 +140,13 @@ public class Hero : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
+        if (collision.tag != "Enemy")
+            return;
         if (collision.transform.TryGetComponent(out Enemy targeted_enemy))
-        {
-            targeted_enemy.TakeDamage(transform, damage);
-        }
+            {
+                Debug.Log("Attack");
+                targeted_enemy.TakeDamage(transform, damage);
+            }
     }
 
     public void ChangeFacingDirection(Vector2 sourcePosition, Vector2 targetPosition)

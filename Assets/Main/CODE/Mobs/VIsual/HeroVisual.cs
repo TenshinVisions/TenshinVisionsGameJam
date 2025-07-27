@@ -34,6 +34,11 @@ public class HeroVisual : MonoBehaviour
         hero.PolygonColliderTurnOn();
     }
 
+    public void TakeHitAnimationTurnOff()
+    {
+        hero.isTakeHit = false;
+    }
+
     void OnDestroy()
     {
         hero.OnHeroAttack -= hero_OnHeroAttack;
@@ -42,7 +47,8 @@ public class HeroVisual : MonoBehaviour
 
     void hero_OnHeroAttack(object sender, System.EventArgs e)
     {
-        animator.SetTrigger(Attack);
+        if (!hero.isTakeHit)
+            animator.SetTrigger(Attack);
     }
 
     void hero_OnHeroTakeHit(object sender, System.EventArgs e)

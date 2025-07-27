@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class DungeonOmMap : MonoBehaviour
 {
-	public bool IsFree =true;
+	public bool IsFree =true, Instal;
 
 	private Vector3 savePosOnMap;
 	private Transform saveParentHere, SeveHero;
@@ -15,6 +15,15 @@ public class DungeonOmMap : MonoBehaviour
 	[SerializeField] private GameObject HiroInDungeon;
 
 	public static Action OpenDangeHandler;
+
+
+	// Setting 
+
+	public bool IsUse = false;
+
+	public List<SettingLauer> Setting = null;
+
+	public static DungeonOmMap CurentOppen;
 
 	public void EnterTheHero(GameObject hero)
 	{
@@ -29,7 +38,7 @@ public class DungeonOmMap : MonoBehaviour
 	public void OpenDange()
 	{
 		buttonsObj.gameObject.SetActive(false);
-
+		CurentOppen = this;
 		OpenDangeHandler?.Invoke();
 	}
 

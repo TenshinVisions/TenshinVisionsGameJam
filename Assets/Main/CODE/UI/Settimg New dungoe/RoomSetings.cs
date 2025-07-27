@@ -52,5 +52,5 @@ public class RoomSetings : MonoBehaviour
 
 public enum RoomType
 {
-	aaa, bbb, c, d, e, f,
+
 }

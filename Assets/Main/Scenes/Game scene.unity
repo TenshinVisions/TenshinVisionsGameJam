@@ -510,7 +510,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 0
+      m_TileSpriteIndex: 7
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1073,8 +1073,8 @@ Tilemap:
   - m_RefCount: 2
     m_Data: {fileID: 11400000, guid: 1118e7ade8a860949a3abb5fe11c3e4a, type: 2}
   m_TileSpriteArray:
-  - m_RefCount: 1
-    m_Data: {fileID: -2066802560, guid: d01c83ca40cd9554790c48ccfa3c2d03, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 2
     m_Data: {fileID: -2119223604, guid: d01c83ca40cd9554790c48ccfa3c2d03, type: 3}
   - m_RefCount: 7
@@ -1087,8 +1087,8 @@ Tilemap:
     m_Data: {fileID: -1863602239, guid: d01c83ca40cd9554790c48ccfa3c2d03, type: 3}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 1
+    m_Data: {fileID: -2066802560, guid: d01c83ca40cd9554790c48ccfa3c2d03, type: 3}
   - m_RefCount: 4
     m_Data: {fileID: 532545264, guid: 8007e8697c23dc045b0c70f96569246a, type: 3}
   - m_RefCount: 1
@@ -1202,6 +1202,7 @@ GameObject:
   - component: {fileID: 303912844}
   - component: {fileID: 303912846}
   - component: {fileID: 303912845}
+  - component: {fileID: 303912847}
   m_Layer: 5
   m_Name: charecter
   m_TagString: Untagged
@@ -1266,6 +1267,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 303912843}
   m_CullTransparentMesh: 1
+--- !u!114 &303912847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 303912843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ebd19a6d07c347d45939b1ea5864d3e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 0}
+  State: 0
+  mapSize: {x: 0, y: 0}
+  speed: 0
+  Canceles: []
+  curentDange: {fileID: 0}
+  maxSleepTime: 0
 --- !u!1 &356280646
 GameObject:
   m_ObjectHideFlags: 0
